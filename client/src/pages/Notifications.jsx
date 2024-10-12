@@ -10,9 +10,15 @@ const NotificationsList = () => {
     useEffect(() => {
         let isMounted = true;
         
+        // Get user ID from local storage
+        const userId = localStorage.getItem('userId'); // Change 'userId' to your local storage key if different
+        console.log(userId);
         const fetchNotifications = async () => {
             try {
-                const response = await axios.get(`/api/notifications/{your_user_id}`);
+                console.log("laa rhaa hu notifications ");
+                const response = await axios.get(`/api/notifications/${userId}`); // Use the userId in the API call
+                
+                console.log(response.data);
                 if (isMounted) {
                     setNotifications(response.data);
                 }

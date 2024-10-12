@@ -4,10 +4,9 @@ const DailyAttendance = require('../models/DailyAttendance');
 
 exports.getAttendance = async (req, res) => {
   try {
-    // Use req.user._id from the authenticated user
     const userId = req.user._id;
 
-    console.log('Fetched userId:', userId);  // Add console log to verify
+    console.log('Fetched userId:', userId);
 
     const attendanceData = await Attendance.findOne({ userId });
     if (!attendanceData) {
