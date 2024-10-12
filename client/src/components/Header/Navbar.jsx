@@ -28,6 +28,14 @@ function Icons() {
   const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+
+    navigate('/login');
+  };
+
   return (
     <div className="fixed top-7 right-4 flex items-center space-x-4">
       <div
@@ -41,6 +49,12 @@ function Icons() {
         onClick={() => navigate(`/profile/${userId}`)}
       >
         <span className="text-black dark:text-white">P</span>
+      </div>
+      <div
+        className="bg-crimson text-white rounded-full px-4 py-2 flex items-center justify-center cursor-pointer hover:bg-red-700"
+        onClick={handleLogout}
+      >
+        <span className="font-bold">Logout</span>
       </div>
     </div>
   );

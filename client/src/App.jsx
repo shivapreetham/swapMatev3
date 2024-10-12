@@ -30,8 +30,8 @@ function App() {
               <Route path="/calender" element={<Calender />} />
               <Route path="/globalrequest" element={<GlobalRequest />} />
               <Route path="/privaterequest" element={<PrivateRequestPage/>} />
-              <Route path="/notifications" element={<NotificationsList />} />
-              <Route path="/chat" element={<Chat />} />
+              {/* <Route path="/notifications" element={<NotificationsList />} /> */}
+              {/* <Route path="/chat" element={<Chat />} /> */}
               <Route path="/signup" element={<SignupFormDemo />} />
               <Route path="/login" element={<Login />} />
             </Routes>

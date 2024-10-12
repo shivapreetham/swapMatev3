@@ -14,6 +14,8 @@ function SignUpForm() {
     personalEmail: '',
     password: '',
     confirmPassword: '',
+    webUsername: '',
+    webPassword: ''
   });
 
   const handleChange = (e) => {
@@ -33,11 +35,13 @@ function SignUpForm() {
     }
 
     try {
-      await signup(
+      const response = await signup(
         formValues.username,
         formValues.password,
         formValues.collegeEmail,
-        formValues.personalEmail
+        formValues.personalEmail,
+        formValues.webUsername,
+        formValues.webPassword
       );
       localStorage.setItem('token', response.token);
       localStorage.setItem('userId', response._id);
@@ -59,25 +63,46 @@ function SignUpForm() {
       </p>
 
       <form className="my-8" onSubmit={handleSubmit}>
+        {/* Username Input */}
         <LabelInputContainer className="mb-4">
           <Label htmlFor="username">Username</Label>
           <Input id="username" name="username" placeholder="Your username" type="text" value={formValues.username} onChange={handleChange} />
         </LabelInputContainer>
+        
+        {/* College Email Input */}
         <LabelInputContainer className="mb-4">
           <Label htmlFor="collegeEmail">College Email</Label>
           <Input id="collegeEmail" name="collegeEmail" placeholder="Your college email" type="email" value={formValues.collegeEmail} onChange={handleChange} />
         </LabelInputContainer>
+
+        {/* Personal Email Input */}
         <LabelInputContainer className="mb-4">
           <Label htmlFor="personalEmail">Personal Email</Label>
           <Input id="personalEmail" name="personalEmail" placeholder="Your personal email" type="email" value={formValues.personalEmail} onChange={handleChange} />
         </LabelInputContainer>
+
+        {/* Password Input */}
         <LabelInputContainer className="mb-4">
           <Label htmlFor="password">Password</Label>
           <Input id="password" name="password" placeholder="••••••••" type="password" value={formValues.password} onChange={handleChange} />
         </LabelInputContainer>
+
+        {/* Confirm Password Input */}
         <LabelInputContainer className="mb-8">
           <Label htmlFor="confirmPassword">Confirm Password</Label>
           <Input id="confirmPassword" name="confirmPassword" placeholder="••••••••" type="password" value={formValues.confirmPassword} onChange={handleChange} />
+        </LabelInputContainer>
+
+        {/* Web Username Input */}
+        <LabelInputContainer className="mb-4">
+          <Label htmlFor="webUsername">Web Username</Label>
+          <Input id="webUsername" name="webUsername" placeholder="Your web username" type="text" value={formValues.webUsername} onChange={handleChange} />
+        </LabelInputContainer>
+
+        {/* Web Password Input */}
+        <LabelInputContainer className="mb-4">
+          <Label htmlFor="webPassword">Web Password</Label>
+          <Input id="webPassword" name="webPassword" placeholder="••••••••" type="password" value={formValues.webPassword} onChange={handleChange} />
         </LabelInputContainer>
 
         <button
