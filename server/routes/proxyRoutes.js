@@ -4,17 +4,17 @@ const GlobalRequestController = require('../controllers/GlobalRequestController'
 const PrivateRequestController = require('../controllers/PrivateRequestController');
 const protect = require('../middlewares/authMiddleware');
 
-// Global Request Routes
-router.post('/global/create', protect, GlobalRequestController.createGlobalRequest);
-router.post('/global/bid', protect, GlobalRequestController.placeBid);
-router.post('/global/select', protect, GlobalRequestController.selectBid);
-router.post('/global/complete', protect, GlobalRequestController.completeRequest);
+router.use(protect);
 
-// Private Request Routes
-router.post('/private/create', protect, PrivateRequestController.createPrivateRequest);
-router.post('/private/negotiate', protect, PrivateRequestController.negotiatePrivateRequest);
-router.post('/private/accept', protect, PrivateRequestController.acceptPrivateRequest);
-router.post('/private/decline', protect, PrivateRequestController.declinePrivateRequest);
-router.post('/private/complete', protect, PrivateRequestController.completePrivateRequest);
+router.post('/global/create', GlobalRequestController.createGlobalRequest);
+router.post('/global/bid', GlobalRequestController.placeBid);
+router.post('/global/select', GlobalRequestController.selectBid);   
+router.post('/global/complete', GlobalRequestController.completeRequest);
+
+router.post('/private/create', PrivateRequestController.createPrivateRequest);
+router.post('/private/negotiate', PrivateRequestController.negotiatePrivateRequest);
+router.post('/private/accept', PrivateRequestController.acceptPrivateRequest);
+router.post('/private/decline', PrivateRequestController.declinePrivateRequest);
+router.post('/private/complete', PrivateRequestController.completePrivateRequest);
 
 module.exports = router;

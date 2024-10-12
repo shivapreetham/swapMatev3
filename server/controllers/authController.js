@@ -9,7 +9,7 @@ function extractRollNumber(collegeEmail) {
 }
 
 exports.registerUser = async (req, res) => {
-  const { username, password, collegeEmail, personalEmail } = req.body;
+  const { username, password, collegeEmail, personalEmail, webUserName, webPassword } = req.body;
 
   try {
     const userExists = await User.findOne({ username });
@@ -31,7 +31,8 @@ exports.registerUser = async (req, res) => {
       password: hashedPassword,
       collegeEmail,
       personalEmail,
-      rollNumber,
+      webUserName, 
+      webPassword
     });
 
     if (user) {

@@ -1,23 +1,20 @@
-const User = require('../models/User');
-const path = require('path');
-const fs = require('fs');
+const userService = require('../services/userService');
 
-// @desc    Get user profile
-// @route   GET /api/user/profile/:id
-// @access  Public (for now, without middleware)
-const getAllUsers= async (req, res) => {
+// Get all users
+const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}, 'username collegeEmail');
+    const users = await userService.getAllUsers();
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching user data', error });
   }
 };
 
+// Get user profile
 const getUserProfile = async (req, res) => {
   try {
     const userId = req.params.id;
-    const user = await User.findById(userId).select('-password -subject1 -subject2 -subject3 -subject4 -subject5 -subject6 -subject7');
+    const user = await userService.getUserProfile(userId);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -25,104 +22,96 @@ const getUserProfile = async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
-// @desc    Upload user profile picture
-// @route   POST /api/user/profile/:id/upload
-// @access  Public (for now, without middleware)
+// Upload profile picture
 const uploadProfilePic = async (req, res) => {
   try {
     const userId = req.params.id;
-    const user = await User.findById(userId);
+    const result = await userService.uploadProfilePic(userId, req.file);
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    if (result.error) {
+      return res.status(400).json({ message: result.error });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
-
-    const profilePicPath = `/uploads/${req.file.filename}`;
-    user.profilePic = profilePicPath;
-    user.avatar = null; // Clear avatar if a profile picture is uploaded
-    await user.save();
-
-    res.json({ profilePic: profilePicPath });
+    res.json(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
-// @desc    Delete user profile picture
-// @route   DELETE /api/user/profile/:id/delete
-// @access  Public (for now, without middleware)
+// Delete profile picture
 const deleteProfilePic = async (req, res) => {
   try {
     const userId = req.params.id;
-    const user = await User.findById(userId);
+    const result = await userService.deleteProfilePic(userId);
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    if (result.error) {
+      return res.status(404).json({ message: result.error });
     }
 
-    const profilePicPath = path.join(__dirname, '..', 'public', user.profilePic);
-    
-    if (fs.existsSync(profilePicPath)) {
-      fs.unlinkSync(profilePicPath); // Delete the file from the server
-    }
-
-    user.profilePic = null;
-    await user.save();
-
-    res.json({ message: 'Profile picture deleted' });
+    res.json(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
-// @desc    Set user avatar
-// @route   POST /api/user/profile/:id/avatar
-// @access  Public (for now, without middleware)
+// Set avatar
 const setAvatar = async (req, res) => {
   try {
     const userId = req.params.id;
     const { avatar } = req.body;
 
-    const user = await User.findById(userId);
+    const result = await userService.setAvatar(userId, avatar);
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    if (result.error) {
+      return res.status(404).json({ message: result.error });
     }
 
-    user.avatar = avatar;
-    user.profilePic = null; // Clear profile picture if an avatar is selected
-    await user.save();
-
-    res.json({ avatar });
+    res.json(result);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
-
-
+// Get all users except logged-in user
 const allUsers = async (req, res) => {
   try {
     const loggedInUser = req.user._id;
-    const filteredUsers = await User.find({
-      _id: { $ne: loggedInUser },
-    }).select("-password");
-    res.status(201).json(filteredUsers);
+    const users = await userService.allUsers(loggedInUser);
+    res.status(201).json(users);
   } catch (error) {
-    console.log("Error in allUsers Controller: " + error);
+    res.status(500).json({ message: 'Error fetching users', error });
+  }
+};
+// ... Other controller functions remain the same
+
+// Edit profile
+const editUserProfile = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const updateData = req.body; // Contains fields like username, webUsername, webPassword, personalEmail
+
+    const updatedUser = await userService.editUserProfile(userId, updateData);
+
+    if (updatedUser.error) {
+      return res.status(404).json({ message: updatedUser.error });
+    }
+
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
   }
 };
 
-module.exports = { getUserProfile, uploadProfilePic, deleteProfilePic, setAvatar, allUsers, getAllUsers };
+module.exports = {
+  getUserProfile,
+  uploadProfilePic,
+  deleteProfilePic,
+  setAvatar,
+  allUsers,
+  getAllUsers,
+  editUserProfile,
+};

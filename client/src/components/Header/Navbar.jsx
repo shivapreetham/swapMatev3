@@ -18,29 +18,73 @@ function Logo() {
     <div className="fixed top-8 left-4">
       <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
         <span className="text-black dark:text-white font-bold">
-          <img src="C:\Users\SHIVAPREETHAM ROHITH\Desktop\mern-projects\SwapMate\client\public\assets\Screenshot_2024-07-13_172732-removebg-preview.png" alt="L" />
+          <img src="C:\Users\SHIVAPREETHAM ROHITH\Desktop\mern-projects\SwapMate\client\public\assets\Screenshot_2024-07-13_172732-removebg-preview.png" alt="Logo" />
         </span>
       </div>
     </div>
   );
 }
+
 function Icons() {
   const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('username');
+    navigate('/login');
+  };
+
+  // Fetch unread notifications count
+  useEffect(() => {
+    const fetchUnreadNotifications = async () => {
+      try {
+        const response = await fetch(`/api/notifications/unread-count/${userId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUnreadCount(data.unreadCount); // Assuming your API returns an object like { unreadCount: number }
+        } else {
+          console.error('Failed to fetch unread notifications count');
+        }
+      } catch (error) {
+        console.error('Error fetching unread notifications:', error);
+      }
+    };
+
+    fetchUnreadNotifications();
+  }, [userId]);
 
   return (
     <div className="fixed top-7 right-4 flex items-center space-x-4">
       <div
-        className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-400"
-        onClick={() => navigate('/notifications')}
+        className="relative w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-400"
+        onClick={() => navigate(`/notifications/${userId}`)}
       >
         <span className="text-black dark:text-white">N</span>
+        {unreadCount > 0 && (
+          <div className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full" />
+        )}
       </div>
       <div
         className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-400"
         onClick={() => navigate(`/profile/${userId}`)}
       >
         <span className="text-black dark:text-white">P</span>
+      </div>
+      <div
+        className="bg-crimson text-white rounded-full px-4 py-2 flex items-center justify-center cursor-pointer hover:bg-red-700"
+        onClick={handleLogout}
+      >
+        <span className="font-bold">Logout</span>
       </div>
     </div>
   );
@@ -57,7 +101,7 @@ function Navbar({ className }) {
       if (window.scrollY > lastScrollY) {
         setShowNavbar(false); // Hide navbar on scroll down
       } else {
-        setShowNavbar(true); 
+        setShowNavbar(true);
       }
       lastScrollY = window.scrollY;
     };
@@ -116,9 +160,9 @@ function Navbar({ className }) {
         </MenuItem>
         <MenuItem setActive={setActive} active={active} item="Chat">
           <div className="flex flex-col space-y-4 text-sm">
-            <HoveredLink href="/chat">Global Chat</HoveredLink>
-            <HoveredLink href="/chat">Private Groups</HoveredLink>
-            <HoveredLink href="/chat/">Private Chat</HoveredLink>
+            <HoveredLink href="">Global Chat</HoveredLink>
+            <HoveredLink href="">Private Groups</HoveredLink>
+            <HoveredLink href="">Private Chat</HoveredLink>
           </div>
         </MenuItem>
       </Menu>

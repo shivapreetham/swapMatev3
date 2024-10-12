@@ -14,7 +14,6 @@ import Leaderboard from "./pages/Leaderboard";
 import GlobalRequest from './pages/GlobalRequest';
 import ProfilePage from './pages/Profile';
 import NotificationsList from './pages/Notifications';
-import Chat from './pages/Chat';
 import PrivateRequestPage from './pages/PrivateRequest';
 
 function App() {
@@ -23,15 +22,14 @@ function App() {
           <ThemeProvider>
             <Routes>
               <Route path="/" element={<PrivateRoute element={<HomePage />} />} />
-              <Route path="/profile/:id" element={<ProfileWrapper />} />
+              <Route path="/profile/:userId" element={<ProfileWrapper />} />
               <Route path="/markMyAttendance" element={<MarkAttendance />} />
               <Route path="/getMyAttendance" element={<GetAttendance />} />
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/calender" element={<Calender />} />
               <Route path="/globalrequest" element={<GlobalRequest />} />
               <Route path="/privaterequest" element={<PrivateRequestPage/>} />
-              <Route path="/notifications" element={<NotificationsList />} />
-              <Route path="/chat" element={<Chat />} />
+              <Route path="/notifications/:userId" element={<NotificationsList />} />
               <Route path="/signup" element={<SignupFormDemo />} />
               <Route path="/login" element={<Login />} />
             </Routes>
@@ -41,8 +39,8 @@ function App() {
 }
 
 function ProfileWrapper() {
-  const { id } = useParams(); // Make sure to import useParams at the top
-  return <ProfilePage userId={id} />;
+  const { userId } = useParams(); 
+  return <ProfilePage userId={userId} />;
 }
 
 const PrivateRoute = ({ element }) => {

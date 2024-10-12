@@ -9,7 +9,7 @@ export default function GetAttendancePage() {
   useEffect(() => {
     const fetchAttendanceData = async () => {
       try {
-        const token = localStorage.getItem("authToken"); // or however you store the token
+        const token = localStorage.getItem("authToken");
         const response = await axios.get("/api/attendance/get", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -29,23 +29,53 @@ export default function GetAttendancePage() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center">Loading...</div>;
   }
 
   if (error) {
-    return <div className="text-red-500">{error}</div>;
+    return <div className="text-red-500 text-center">{error}</div>;
   }
 
   if (!attendanceData) {
-    return <div>No attendance data available</div>;
+    return <div className="text-center">No attendance data available</div>;
   }
+
+  const {
+    attendanceData: { subjects },  // Access subjects
+    dailyAttendance,
+    userAttendanceMetrics,
+  } = attendanceData;
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 shadow-md rounded-lg">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">
         Attendance Summary
       </h2>
-      <div className="overflow-x-auto">
+
+      {/* Display overall attendance data */}
+      <div className="mt-6">
+        <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+          Overall Attendance
+        </h3>
+        <p className="mt-2 text-gray-700 dark:text-gray-200">
+          Total Classes Attended: {userAttendanceMetrics?.overallAttendedClasses || 0}
+        </p>
+        <p className="mt-1 text-gray-700 dark:text-gray-200">
+          Total Classes Held: {userAttendanceMetrics?.overallTotalClasses || 0}
+        </p>
+        <p className="mt-1 text-gray-700 dark:text-gray-200">
+          Overall Attendance Percentage:{" "}
+          {userAttendanceMetrics?.overallPercentage?.toFixed(2) || "0.00"}%
+        </p>
+        <p className="mt-1 text-gray-700 dark:text-gray-200">
+          {userAttendanceMetrics?.totalCheck
+            ? "You are above 75% in all subjects."
+            : "You are below 75% in one or more subjects."}
+        </p>
+      </div>
+
+      {/* Display detailed attendance data */}
+      <div className="overflow-x-auto mt-6">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr>
@@ -53,51 +83,58 @@ export default function GetAttendancePage() {
               <th className="border-b-2 p-4">Attended Classes</th>
               <th className="border-b-2 p-4">Total Classes</th>
               <th className="border-b-2 p-4">Attendance %</th>
-              <th className="border-b-2 p-4">Above 75%</th>
-              <th className="border-b-2 p-4">Classes Needed</th>
-              <th className="border-b-2 p-4">Classes Can Skip</th>
             </tr>
           </thead>
           <tbody>
-            {Object.entries(attendanceData.attendanceRecords).map(
-              ([subjectKey, record]) => (
-                <tr key={subjectKey}>
-                  <td className="border-b p-4">{subjectKey}</td>
-                  <td className="border-b p-4">{record.attendedClasses}</td>
-                  <td className="border-b p-4">{record.totalClasses}</td>
+            {subjects.length > 0 ? (
+              subjects.map((subject) => (
+                <tr key={subject.subjectCode}>
+                  <td className="border-b p-4">{subject.subjectName}</td>
+                  <td className="border-b p-4">{subject.presentTotal.split("/")[0]}</td>
+                  <td className="border-b p-4">{subject.presentTotal.split("/")[1]}</td>
                   <td className="border-b p-4">
-                    {record.attendancePercentage.toFixed(2)}%
+                    {subject.attendancePercentage}%
                   </td>
-                  <td className="border-b p-4">
-                    {record.isAbove75 ? "Yes" : "No"}
-                  </td>
-                  <td className="border-b p-4">{record.classesNeeded}</td>
-                  <td className="border-b p-4">{record.classesCanSkip}</td>
                 </tr>
-              )
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center p-4">No subject attendance data available</td>
+              </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Display daily attendance data */}
       <div className="mt-6">
         <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-          Overall Attendance
+          Daily Attendance (Last 7 Days)
         </h3>
-        <p className="mt-2 text-gray-700 dark:text-gray-200">
-          Total Classes Attended: {attendanceData.overallAttendedClasses}
-        </p>
-        <p className="mt-1 text-gray-700 dark:text-gray-200">
-          Total Classes Held: {attendanceData.overallTotalClasses}
-        </p>
-        <p className="mt-1 text-gray-700 dark:text-gray-200">
-          Overall Attendance Percentage:{" "}
-          {attendanceData.overallPercentage.toFixed(2)}%
-        </p>
-        <p className="mt-1 text-gray-700 dark:text-gray-200">
-          {attendanceData.totalCheck
-            ? "You are above 75% in all subjects."
-            : "You are below 75% in one or more subjects."}
-        </p>
+        <ul className="mt-2">
+          {dailyAttendance.length > 0 ? (
+            dailyAttendance.map((record, index) => (
+              <li key={`${record._id}-${index}`} className="border-b py-2">
+                <p className="text-gray-700 dark:text-gray-200">
+                  Date: {new Date(record.date).toLocaleDateString()}
+                </p>
+                <ul className="mt-1 pl-4">
+                  {record.subjects.length > 0 ? (
+                    record.subjects.map((subject) => (
+                      <li key={`${subject.subjectCode}-${index}`} className="py-1">
+                        {subject.subjectName}: {subject.attendedClasses}/{subject.totalClasses}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-center py-2">No classes on this day</li>
+                  )}
+                </ul>
+              </li>
+            ))
+          ) : (
+            <li className="text-center py-2">No daily attendance records available</li>
+          )}
+        </ul>
       </div>
     </div>
   );

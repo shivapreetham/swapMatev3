@@ -3,7 +3,7 @@ const GlobalRequestService = require('../services/globalRequestService');
 exports.createGlobalRequest = async (req, res) => {
   try {
     const { subject, classDate, startTime, duration, minBid, maxBid, bidDuration } = req.body;
-    const requesterId = req.user.id; // Ensure this is correctly set
+    const requesterId = req.user.id;
     console.log(requesterId)
     console.log('Creating global request with:', { requesterId, subject, classDate, startTime, duration, minBid, maxBid, bidDuration });
     const globalRequest = await GlobalRequestService.createGlobalRequest(requesterId, subject, classDate, startTime, duration, minBid, maxBid, bidDuration);

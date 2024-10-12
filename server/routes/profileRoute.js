@@ -1,11 +1,13 @@
-// routes/profileRoute.js
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const protect = require('../middlewares/authMiddleware');
 
+// Apply protect to all routes in this router
+router.use(protect);
+
 // Get user profile
-router.get('/', protect, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
@@ -16,9 +18,9 @@ router.get('/', protect, async (req, res) => {
   }
 });
 
-router.post('/updateProfilePic', protect, async (req, res) => {
+router.post('/updateProfilePic', async (req, res) => {
   try {
-    const { profilePic } = req.body; // Assume profilePic is a URL or file path
+    const { profilePic } = req.body;
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
