@@ -1,4 +1,5 @@
 Attendance and Proxy Management System
+
 A web-based attendance tracking and proxy-seeking system built with the MERN stack (MongoDB, Express.js, React, Node.js). This platform allows students to log their attendance, request or offer proxies, and manage a token-based transaction system.
 
 🚀 Features
